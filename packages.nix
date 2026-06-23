@@ -12,4 +12,5 @@ with pkgs; [
   zathura
   baobab
   nautilus
+  systemd
 ]
