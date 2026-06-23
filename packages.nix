@@ -15,4 +15,5 @@ with pkgs; [
   systemd
   audacity
   qbittorrent
+  man
 ]
