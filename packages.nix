@@ -11,4 +11,5 @@ with pkgs; [
   helix
   zathura
   baobab
+  nautilus
 ]
