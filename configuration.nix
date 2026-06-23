@@ -37,6 +37,9 @@
 
   programs.hyprland.enable = true;
 
+  # add PATH
+  environment.localBinInPath = true;
+
   # Display manager — starts Hyprland on login
   services.greetd = {
     enable = true;
@@ -64,14 +67,8 @@
     shell = pkgs.bash;
   };
 
-  # Minimal system packages; user packages live in home/tiago.nix
-  environment.systemPackages = with pkgs; [
-	git
-	wget
-	curl	
-	vim
-	gh
- ];
+  environment.systemPackages =
+  import ./packages.nix { inherit pkgs; };
 
   nixpkgs.config.allowUnfree = true;
   system.stateVersion = "24.11";

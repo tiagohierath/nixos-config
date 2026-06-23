@@ -10,10 +10,13 @@
     HYPRCURSOR_SIZE = "24";
   };
 
+  home.sessionPath = [
+  "$HOME/.local/bin"
+];
+
   home.packages = with pkgs; [
     # Wayland / Hyprland ecosystem
     swww
-    hypridle
     hyprpaper
     fuzzel
     grimblast
@@ -35,7 +38,6 @@
     yazi
     cmus
     fastfetch
-    lazygit
 
     # Notifications
     dunst
@@ -51,6 +53,14 @@
 
     pkgs-unstable.claude-code
   ];
+  
+  programs.bash = {
+  enable = true;
+
+  initExtra = ''
+    export PATH="$HOME/.local/bin:$PATH"
+  '';
+};
 
   # ── Hyprland ──────────────────────────────────────────────────────────────
   wayland.windowManager.hyprland = {
@@ -73,7 +83,6 @@
       exec-once = mako & udiskie & firefox &
       exec-once = sleep 1 &
       exec-once = waybar
-      exec-once = hypridle &
       exec-once = systemctl --user start opentabletdriver.service
       exec-once = swww-daemon
       exec-once = swww img /home/tiago/Pictures/hmhm.jpg
@@ -1063,39 +1072,6 @@
         timeout = 0
         override_pause_level = 60
         default_icon = dialog-warning
-  '';
-
-  # ── Fastfetch ─────────────────────────────────────────────────────────────
-  xdg.configFile."fastfetch/config.jsonc".text = ''
-    {
-        "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
-        "logo": { "type": "small", "padding": { "top": 1 } },
-        "display": { "separator": " " },
-        "modules": [
-            { "key": "╭───────────╮", "type": "custom" },
-            { "key": "│ {#31} user    {#keys}│", "type": "title", "format": "{user-name}" },
-            { "key": "│ {#32}󰇅 hname   {#keys}│", "type": "title", "format": "{host-name}" },
-            {
-                "type": "command",
-                "key": "│ {#33}󱦟 os age  {#keys}│",
-                "text": "printf \"\\e[0m%s days\\e[0m\" \"$(( ($(date +%s) - $(stat -c %W /)) / 86400 ))\""
-            },
-            { "key": "│ {#34}󰅐 uptime  {#keys}│", "type": "uptime" },
-            { "key": "│ {#34}{icon} distro  {#keys}│", "type": "os" },
-            { "key": "│ {#35} kernel  {#keys}│", "type": "kernel" },
-            { "key": "│ {#36} wm      {#keys}│", "type": "wm" },
-            { "key": "│ {#36}󰇄 desktop {#keys}│", "type": "de" },
-            { "key": "│ {#31} term    {#keys}│", "type": "terminal" },
-            { "key": "│ {#32} shell   {#keys}│", "type": "shell" },
-            { "key": "│ {#33}󰍛 cpu     {#keys}│", "type": "cpu", "showPeCoreCount": true },
-            { "key": "│ {#33}󰢮 gpu     {#keys}│", "type": "gpu" },
-            { "key": "│ {#34}󰉉 disk    {#keys}│", "type": "disk", "folders": "/" },
-            { "key": "│ {#36} memory  {#keys}│", "type": "memory" },
-            { "key": "├───────────┤", "type": "custom" },
-            { "key": "│ {#39} colors  {#keys}│", "type": "colors", "symbol": "circle" },
-            { "key": "╰───────────╯", "type": "custom" }
-        ]
-    }
   '';
 
   # ── Fuzzel ────────────────────────────────────────────────────────────────

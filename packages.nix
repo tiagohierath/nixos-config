@@ -9,4 +9,6 @@ with pkgs; [
   ffmpeg
   yt-dlp
   helix
+  zathura
+  baobab
 ]
