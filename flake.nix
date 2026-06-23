@@ -1,6 +1,5 @@
 {
   description = "tiago's NixOS configuration";
-
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.11";
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
@@ -9,7 +8,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
-
   outputs = { self, nixpkgs, nixpkgs-unstable, home-manager, ... }:
   let
     system = "x86_64-linux";
