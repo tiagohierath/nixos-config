@@ -14,4 +14,5 @@ with pkgs; [
   nautilus
   systemd
   audacity
+  qbittorrent
 ]
