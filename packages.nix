@@ -13,4 +13,5 @@ with pkgs; [
   baobab
   nautilus
   systemd
+  audacity
 ]
