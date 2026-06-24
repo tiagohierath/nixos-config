@@ -16,4 +16,6 @@ with pkgs; [
   audacity
   qbittorrent
   man
+  aerc
+  newsboat
 ]

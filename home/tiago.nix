@@ -348,6 +348,7 @@
 
   # ── yt-dlp ────────────────────────────────────────────────────────────────
   programs.yt-dlp.enable = true;
+  programs.yt-dlp.package = pkgs-unstable.yt-dlp;
 
   # ── Zathura ───────────────────────────────────────────────────────────────
   programs.zathura = {
