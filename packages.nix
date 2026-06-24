@@ -18,4 +18,5 @@ with pkgs; [
   man
   aerc
   newsboat
+  audacious
 ]
