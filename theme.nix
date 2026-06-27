@@ -480,6 +480,11 @@ let
     pkgs.dunst pkgs.waybar pkgs.hyprland pkgs.swaybg
   ];
 
+  # gsettings needs the org.gnome.desktop.interface schema on XDG_DATA_DIRS,
+  # otherwise `gsettings set` errors with "No such schema" and GTK/Firefox
+  # theming silently does nothing.
+  schemaDir = "${pkgs.gsettings-desktop-schemas}/share/gsettings-schemas/${pkgs.gsettings-desktop-schemas.name}";
+
   # theme-switch [toggle|dark|light|login]
   #   toggle/dark/light  full switch (used by Super+i) — re-themes every app
   #   login              apply only what boot can't (wallpaper, GTK/portal,
@@ -489,6 +494,7 @@ let
   theme-switch = pkgs.writeShellScriptBin "theme-switch" ''
     set -euo pipefail
     export PATH=${binPath}:$PATH
+    export XDG_DATA_DIRS="${schemaDir}''${XDG_DATA_DIRS:+:$XDG_DATA_DIRS}"
     C="$HOME/.config"
     st="$HOME/.local/state/theme/mode"
     mkdir -p "$(dirname "$st")"
@@ -509,7 +515,9 @@ let
     if [ "$mode" = dark ]; then wp="${wallpaper.dark}"; else wp="${wallpaper.light}"; fi
     if [ "$full" = 1 ] || [ "$mode" = light ]; then
       [ "$full" = 0 ] && sleep 1
-      pkill -x swaybg 2>/dev/null || true
+      # NOTE: no `-x` — the nix-wrapped process is named ".swaybg-wrapped", so an
+      # exact-name match would never hit it and we'd spawn duplicates.
+      pkill swaybg 2>/dev/null || true
       (setsid swaybg -i "$wp" -m fill >/dev/null 2>&1 &) || true
     fi
 
@@ -536,14 +544,18 @@ let
       cp -f "$C/kitty/themes/$mode.conf" "$C/kitty/current-theme.conf"
       pkill -USR1 kitty 2>/dev/null || true
 
-      # waybar: point style.css at the variant, restart the bar
+      # waybar: point style.css at the variant, then reload in place.
+      # SIGUSR2 makes waybar re-read its config + CSS without spawning a new
+      # process — so no flash and, crucially, no duplicate bars. (The process is
+      # nix-wrapped as ".waybar-wrapped", so match without `-x`.) If none is
+      # running, start one.
       ln -sf "$C/waybar/themes/$mode.css" "$C/waybar/style.css"
-      pkill -x waybar 2>/dev/null || true
-      (setsid waybar >/dev/null 2>&1 &) || true
+      pkill -USR2 waybar 2>/dev/null || (setsid waybar >/dev/null 2>&1 &) || true
 
-      # dunst: swap config + live reload
+      # dunst: swap config + live reload (dunstctl uses D-Bus; the pkill
+      # fallback drops `-x` for the same wrapped-name reason).
       ln -sf "$C/dunst/themes/$mode" "$C/dunst/dunstrc"
-      dunstctl reload 2>/dev/null || { pkill -x dunst 2>/dev/null || true; (setsid dunst >/dev/null 2>&1 &) || true; }
+      dunstctl reload 2>/dev/null || { pkill dunst 2>/dev/null || true; (setsid dunst >/dev/null 2>&1 &) || true; }
 
       # fuzzel / mpv / btop: picked up on next launch
       ln -sf "$C/fuzzel/themes/$mode.ini" "$C/fuzzel/fuzzel.ini"
