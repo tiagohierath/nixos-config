@@ -54,22 +54,14 @@
     };
   };
 
-  # Bluetooth — the headphone connects over A2DP for music/video. Experimental
-  # enables BLE battery reporting (read by the waybar headphone module via
-  # UPower); AutoEnable powers the adapter on boot so trusted devices reconnect.
+  # Bluetooth — the headphone connects over A2DP for music/video. AutoEnable
+  # powers the adapter on boot so trusted devices reconnect on their own.
   hardware.bluetooth = {
     enable = true;
     powerOnBoot = true;
-    settings = {
-      General.Experimental = true;
-      Policy.AutoEnable = true;
-    };
+    settings.Policy.AutoEnable = true;
   };
   services.blueman.enable = true;
-
-  # UPower daemon: exposes battery info (laptop + bluetooth) over D-Bus, which
-  # the waybar headphone-battery module queries.
-  services.upower.enable = true;
 
   programs.hyprland.enable = true;
 

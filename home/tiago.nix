@@ -10,13 +10,23 @@ let
     ${pkgs.pamixer}/bin/pamixer --set-volume 20
   '';
 
-  # Waybar headphone battery: prints "🎧 NN%" when a bluetooth headphone is
-  # connected and reporting battery, otherwise nothing (so the module hides).
-  headphoneBattery = pkgs.writeShellScript "headphone-battery" ''
-    dev=$(${pkgs.upower}/bin/upower -e | ${pkgs.gnugrep}/bin/grep -m1 -iE 'headset|headphone') || exit 0
-    [ -z "$dev" ] && exit 0
-    ${pkgs.upower}/bin/upower -i "$dev" \
-      | ${pkgs.gawk}/bin/awk '/percentage:/ { gsub(/%/, "", $2); printf "🎧 %s%%\n", $2; exit }'
+  # Click the volume/headphone emoji to flip the default output between the
+  # bluetooth headphone and the laptop's internal (PCI) speakers, moving any
+  # currently-playing streams across so the audio follows.
+  toggleSink = pkgs.writeShellScript "toggle-sink" ''
+    pactl=${pkgs.pulseaudio}/bin/pactl
+    default=$("$pactl" get-default-sink)
+    bt=$("$pactl" list short sinks | ${pkgs.gawk}/bin/awk '{print $2}' | ${pkgs.gnugrep}/bin/grep -m1 '^bluez')
+    internal=$("$pactl" list short sinks | ${pkgs.gawk}/bin/awk '{print $2}' | ${pkgs.gnugrep}/bin/grep -m1 'pci-')
+    case "$default" in
+      bluez*) target="$internal" ;;
+      *)      target="''${bt:-$internal}" ;;
+    esac
+    [ -z "$target" ] && exit 0
+    "$pactl" set-default-sink "$target"
+    "$pactl" list short sink-inputs | ${pkgs.gawk}/bin/awk '{print $1}' | while read -r id; do
+      "$pactl" move-sink-input "$id" "$target" 2>/dev/null || true
+    done
   '';
 in
 {
@@ -52,9 +62,6 @@ in
     pavucontrol
     brightnessctl
     playerctl
-
-    # Battery info (laptop + bluetooth headphone) for waybar
-    upower
 
     # System tools
     udiskie
@@ -415,7 +422,7 @@ in
 
         "modules-left": ["custom/smallspacer","custom/oscomputer","hyprland/workspaces","custom/spacer","hyprland/window"],
         "modules-center": ["custom/padd","custom/l_end","custom/r_end","mpris","custom/padd"],
-        "modules-right": ["custom/padd","custom/l_end","group/expand","custom/spacer","custom/bitcoin","custom/spacer","custom/weather","custom/spacer","network","custom/spacer","group/expand-3","custom/spacer","custom/headphone","custom/spacer","group/expand-2","custom/spacer","custom/date","custom/spacer","clock","custom/spacer","custom/notification","custom/padd"],
+        "modules-right": ["custom/padd","custom/l_end","group/expand","custom/spacer","custom/bitcoin","custom/spacer","custom/weather","custom/spacer","network","custom/spacer","group/expand-3","custom/spacer","group/expand-2","custom/spacer","custom/date","custom/spacer","clock","custom/spacer","custom/notification","custom/padd"],
 
         "custom/smallspacer": { "format": " " },
 
@@ -496,13 +503,6 @@ in
             "ignore-workspaces": ["5","6","7","8","9","10"]
         },
 
-        "custom/headphone": {
-            "exec": "${headphoneBattery}",
-            "format": "{}",
-            "interval": 15,
-            "tooltip": false
-        },
-
         "idle_inhibitor": {
             "format": "{icon}",
             "format-icons": { "activated": "󰥔", "deactivated": "" }
@@ -580,7 +580,9 @@ in
 
         "pulseaudio": {
             "format": "🔊 {volume}%",
+            "format-bluetooth": "🎧 {volume}%",
             "format-muted": "🔇",
+            "on-click": "${toggleSink}",
             "tooltip-format": "{icon} {desc} // {volume}%",
             "scroll-step": 1,
             "smooth-scrolling-threshold": 4,
@@ -726,15 +728,6 @@ in
         font-size: 18px;
         color: #d3869b;
         background: rgba(22, 19, 32, 0.0);
-        padding-left: 3px;
-        padding-right: 3px;
-    }
-
-    #custom-headphone {
-        font-weight: normal;
-        font-size: 15px;
-        color: #8ec07c;
-        background: rgba(23, 23, 23, 0.0);
         padding-left: 3px;
         padding-right: 3px;
     }
