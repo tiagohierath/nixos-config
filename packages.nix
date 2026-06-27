@@ -19,6 +19,7 @@ with pkgs; [
   aerc
   newsboat
   audacious
+  aerc
   pkgs-unstable.claude-code
 ]
 

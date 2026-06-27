@@ -28,6 +28,31 @@ let
       "$pactl" move-sink-input "$id" "$target" 2>/dev/null || true
     done
   '';
+
+  # Waybar audio module (custom): label is the volume with 🎧 when the bluetooth
+  # headphone is the output, else 🔊 (🔇 when muted). The hover tooltip carries
+  # the headphone battery (via UPower) — kept out of the label to stay clean.
+  audioStatus = pkgs.writeShellScript "audio-status" ''
+    default=$(${pkgs.pulseaudio}/bin/pactl get-default-sink)
+    vol=$(${pkgs.pamixer}/bin/pamixer --get-volume 2>/dev/null || echo 0)
+    muted=$(${pkgs.pamixer}/bin/pamixer --get-mute 2>/dev/null || echo false)
+
+    case "$default" in
+      bluez*) icon="🎧" ;;
+      *)      icon="🔊" ;;
+    esac
+    if [ "$muted" = "true" ]; then text="🔇"; else text="$icon $vol%"; fi
+
+    dev=$(${pkgs.upower}/bin/upower -e | ${pkgs.gnugrep}/bin/grep -m1 -iE 'headset|headphone')
+    if [ -n "$dev" ]; then
+      pct=$(${pkgs.upower}/bin/upower -i "$dev" | ${pkgs.gawk}/bin/awk '/percentage:/ { gsub(/%/, "", $2); print $2; exit }')
+      if [ -n "$pct" ]; then tip="🎧 Battery: $pct%"; else tip="🎧 Connected (battery unknown)"; fi
+    else
+      tip="🔊 Laptop speakers"
+    fi
+
+    printf '{"text":"%s","tooltip":"%s"}\n' "$text" "$tip"
+  '';
 in
 {
   home.username = "tiago";
@@ -62,6 +87,7 @@ in
     pavucontrol
     brightnessctl
     playerctl
+    upower
 
     # System tools
     udiskie
@@ -422,7 +448,7 @@ in
 
         "modules-left": ["custom/smallspacer","custom/oscomputer","hyprland/workspaces","custom/spacer","hyprland/window"],
         "modules-center": ["custom/padd","custom/l_end","custom/r_end","mpris","custom/padd"],
-        "modules-right": ["custom/padd","custom/l_end","group/expand","custom/spacer","custom/bitcoin","custom/spacer","custom/weather","custom/spacer","network","custom/spacer","group/expand-3","custom/spacer","group/expand-2","custom/spacer","custom/date","custom/spacer","clock","custom/spacer","custom/notification","custom/padd"],
+        "modules-right": ["custom/padd","custom/l_end","group/expand","custom/spacer","custom/bitcoin","custom/spacer","custom/weather","custom/spacer","network","custom/spacer","custom/audio","custom/spacer","group/expand-2","custom/spacer","custom/date","custom/spacer","clock","custom/spacer","custom/notification","custom/padd"],
 
         "custom/smallspacer": { "format": " " },
 
@@ -558,16 +584,6 @@ in
             "modules": ["backlight","backlight/slider","custom/smallspacer"]
         },
 
-        "group/expand-3": {
-            "orientation": "horizontal",
-            "drawer": {
-                "transition-duration": 600,
-                "children-class": "not-power",
-                "transition-to-left": true
-            },
-            "modules": ["pulseaudio","pulseaudio/slider"]
-        },
-
         "network": {
             "tooltip": true,
             "format-wifi": "📶",
@@ -578,30 +594,21 @@ in
             "interval": 2
         },
 
-        "pulseaudio": {
-            "format": "🔊 {volume}%",
-            "format-bluetooth": "🎧 {volume}%",
-            "format-muted": "🔇",
-            "on-click": "${toggleSink}",
-            "tooltip-format": "{icon} {desc} // {volume}%",
-            "scroll-step": 1,
-            "smooth-scrolling-threshold": 4,
-            "format-icons": {
-                "headphone": "", "hands-free": "", "headset": "",
-                "phone": "", "portable": "", "car": "",
-                "default": ["", "", ""]
-            }
+        "custom/audio": {
+            "exec": "${audioStatus}",
+            "return-type": "json",
+            "format": "{}",
+            "interval": 3,
+            "signal": 8,
+            "on-click": "${toggleSink} && ${pkgs.procps}/bin/pkill -RTMIN+8 waybar",
+            "on-click-right": "${pkgs.pamixer}/bin/pamixer -t && ${pkgs.procps}/bin/pkill -RTMIN+8 waybar",
+            "on-scroll-up": "${pkgs.pamixer}/bin/pamixer -i 5 && ${pkgs.procps}/bin/pkill -RTMIN+8 waybar",
+            "on-scroll-down": "${pkgs.pamixer}/bin/pamixer -d 5 && ${pkgs.procps}/bin/pkill -RTMIN+8 waybar"
         },
 
         "backlight/slider": {
             "min": 5, "max": 100,
             "device": "intel_backlight",
-            "scroll-step": 1,
-            "smooth-scrolling-threshold": 4
-        },
-
-        "pulseaudio/slider": {
-            "min": 5, "max": 100,
             "scroll-step": 1,
             "smooth-scrolling-threshold": 4
         },
@@ -723,9 +730,9 @@ in
         padding-right: 10px;
     }
 
-    #pulseaudio {
+    #custom-audio {
         font-weight: normal;
-        font-size: 18px;
+        font-size: 15px;
         color: #d3869b;
         background: rgba(22, 19, 32, 0.0);
         padding-left: 3px;
@@ -783,15 +790,13 @@ in
         opacity: 0.1;
     }
 
-    #backlight-slider slider,
-    #pulseaudio-slider slider {
+    #backlight-slider slider {
         background-color: transparent;
         box-shadow: none;
         margin-right: 7px;
     }
 
-    #backlight-slider trough,
-    #pulseaudio-slider trough {
+    #backlight-slider trough {
         margin-top: -3px;
         min-width: 90px;
         min-height: 10px;
@@ -800,8 +805,7 @@ in
         background: #504945;
     }
 
-    #backlight-slider highlight,
-    #pulseaudio-slider highlight {
+    #backlight-slider highlight {
         border-radius: 8px;
         background-color: #83a598;
     }
