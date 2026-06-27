@@ -4,10 +4,14 @@
   home.homeDirectory = "/home/tiago";
   home.stateVersion = "24.11";
 
-  home.sessionVariables = {
-    HYPRCURSOR_THEME = "Nordzy-hyprcursors";
-    XCURSOR_SIZE = "24";
-    HYPRCURSOR_SIZE = "24";
+  # One cursor theme for every app: X11/XWayland, GTK, and Wayland/Hyprland.
+  # Sets XCURSOR_THEME/XCURSOR_SIZE, GTK cursor-theme, and installs the package.
+  home.pointerCursor = {
+    gtk.enable = true;
+    x11.enable = true;
+    package = pkgs.nordzy-cursor-theme;
+    name = "Nordzy-cursors";
+    size = 24;
   };
 
   home.sessionPath = [
@@ -16,7 +20,7 @@
 
   home.packages = with pkgs; [
     # Wayland / Hyprland ecosystem
-    swww
+    swaybg
     hyprpaper
     fuzzel
     grimblast
@@ -30,7 +34,6 @@
 
     # System tools
     udiskie
-    waypaper
 
     # Apps
     firefox
@@ -50,6 +53,7 @@
     feh
 
     curl
+    python3
 
     pkgs-unstable.claude-code
   ];
@@ -83,15 +87,13 @@
       exec-once = sleep 1 &
       exec-once = waybar
       exec-once = systemctl --user start opentabletdriver.service
-      exec-once = swww-daemon
-      exec-once = swww img /home/tiago/Pictures/hmhm.jpg
+      exec-once = swaybg -i /home/tiago/projects/wallpaper1.png -m fill
       exec-once = wl-paste --watch cliphist store
       exec-once = dunst
       exec-once = mpv --really-quiet /home/tiago/Downloads/windows-7-startup.mp3
 
-      env = HYPRCURSOR_THEME,Nordzy-hyprcursors
+      env = XCURSOR_THEME,Nordzy-cursors
       env = XCURSOR_SIZE,24
-      env = HYPRCURSOR_SIZE,24
       env = fileManager,yazi
 
       binds {
@@ -267,38 +269,38 @@
       cursor_blink = true;
       enable_audio_bell = true;
 
-      # Catppuccin Latte
-      foreground = "#4C4F69";
-      background = "#EFF1F5";
-      selection_foreground = "#EFF1F5";
-      selection_background = "#DC8A78";
-      cursor = "#DC8A78";
-      cursor_text_color = "#EFF1F5";
-      url_color = "#DC8A78";
-      active_border_color = "#7287FD";
-      inactive_border_color = "#9CA0B0";
-      bell_border_color = "#DF8E1D";
-      active_tab_foreground = "#EFF1F5";
-      active_tab_background = "#8839EF";
-      inactive_tab_foreground = "#4C4F69";
-      inactive_tab_background = "#9CA0B0";
-      tab_bar_background = "#BCC0CC";
-      color0 = "#5C5F77";
-      color8 = "#6C6F85";
-      color1 = "#D20F39";
-      color9 = "#D20F39";
-      color2 = "#40A02B";
-      color10 = "#40A02B";
-      color3 = "#DF8E1D";
-      color11 = "#DF8E1D";
-      color4 = "#1E66F5";
-      color12 = "#1E66F5";
-      color5 = "#EA76CB";
-      color13 = "#EA76CB";
-      color6 = "#179299";
-      color14 = "#179299";
-      color7 = "#ACB0BE";
-      color15 = "#BCC0CC";
+      # Gruvbox Dark (hard contrast)
+      foreground = "#EBDBB2";
+      background = "#1D2021";
+      selection_foreground = "#1D2021";
+      selection_background = "#EBDBB2";
+      cursor = "#EBDBB2";
+      cursor_text_color = "#1D2021";
+      url_color = "#83A598";
+      active_border_color = "#B8BB26";
+      inactive_border_color = "#665C54";
+      bell_border_color = "#FABD2F";
+      active_tab_foreground = "#1D2021";
+      active_tab_background = "#A89984";
+      inactive_tab_foreground = "#A89984";
+      inactive_tab_background = "#3C3836";
+      tab_bar_background = "#1D2021";
+      color0 = "#282828";
+      color8 = "#928374";
+      color1 = "#CC241D";
+      color9 = "#FB4934";
+      color2 = "#98971A";
+      color10 = "#B8BB26";
+      color3 = "#D79921";
+      color11 = "#FABD2F";
+      color4 = "#458588";
+      color12 = "#83A598";
+      color5 = "#B16286";
+      color13 = "#D3869B";
+      color6 = "#689D6A";
+      color14 = "#8EC07C";
+      color7 = "#A89984";
+      color15 = "#EBDBB2";
     };
   };
 
@@ -613,27 +615,27 @@
     #custom-notification {
       font-family: "JetBrains Mono Nerd Font";
       font-size: 17px;
-      color: #A1BDCE;
+      color: #ebdbb2;
       margin: 2px 0px 0px 0px;
     }
 
     window#waybar {
-        background: #0F0F17;
+        background: #1d2021;
         border: 3px solid rgba(255, 255, 255, 0.1);
         border-radius: 10px;
     }
 
     tooltip {
-        background: #171717;
-        color: #A1BDCE;
+        background: #282828;
+        color: #ebdbb2;
         font-size: 13px;
         border-radius: 7px;
-        border: 2px solid #101a24;
+        border: 2px solid #3c3836;
     }
 
     #workspaces {
         background: rgba(23, 23, 23, 0.0);
-        color: #888789;
+        color: #928374;
         border-radius: 9px;
         transition: 0.2s ease;
         padding-left: 4px;
@@ -643,7 +645,7 @@
 
     #workspaces button {
         background: rgba(23, 23, 23, 0.0);
-        color: #A1BDCE;
+        color: #ebdbb2;
         border-radius: 9px;
         transition: 0.2s ease;
         padding-left: 4px;
@@ -651,7 +653,7 @@
     }
 
     #workspaces button.active {
-        color: #A1BDCE;
+        color: #ebdbb2;
         transition: all 0.3s ease;
         padding-left: 4px;
         padding-right: 4px;
@@ -659,14 +661,14 @@
 
     #workspaces button:hover {
         background: none;
-        color: #72D792;
+        color: #b8bb26;
         transition: all 0.5s cubic-bezier(.55,-0.68,.48,1.682);
     }
 
     #custom-bitcoin,
     #custom-weather,
     #custom-date {
-        color: #A1BDCE;
+        color: #ebdbb2;
         font-weight: normal;
         font-size: 15px;
         padding-left: 4px;
@@ -675,7 +677,7 @@
 
     #custom-spacer {
         opacity: 1.0;
-        color: #A1BDCE;
+        color: #ebdbb2;
         font-weight: bold;
         padding-left: 2px;
         padding-right: 2px;
@@ -684,7 +686,7 @@
     #custom-smallspacer { opacity: 0.0; }
 
     #backlight {
-        color: #2096C0;
+        color: #83a598;
         background: rgba(23, 23, 23, 0.0);
         font-weight: normal;
         font-size: 19px;
@@ -696,15 +698,15 @@
     #battery {
         font-weight: normal;
         font-size: 22px;
-        color: #a6d189;
+        color: #b8bb26;
         background: rgba(23, 23, 23, 0.0);
     }
 
-    #battery.charging, #battery.plugged { color: #E8EDF0; }
+    #battery.charging, #battery.plugged { color: #fbf1c7; }
     #battery.critical:not(.charging) { color: red; }
 
     #clock {
-        color: #A1BDCE;
+        color: #ebdbb2;
         font-size: 15px;
         font-weight: 900;
         font-family: "JetBrains Mono Nerd Font";
@@ -717,14 +719,14 @@
     #pulseaudio {
         font-weight: normal;
         font-size: 18px;
-        color: #6F8FDB;
+        color: #d3869b;
         background: rgba(22, 19, 32, 0.0);
         padding-left: 3px;
         padding-right: 3px;
     }
 
     #network {
-        color: #A1BDCE;
+        color: #ebdbb2;
         font-weight: normal;
         font-size: 19px;
         padding-right: 0px;
@@ -743,18 +745,18 @@
     }
 
     @keyframes blink {
-        to { color: #4a4a4a; }
+        to { color: #665c54; }
     }
 
     #tray, #window {
-        color: #A1BDCE;
+        color: #ebdbb2;
         font-family: "Martian Mono";
     }
 
     #custom-l_end,
     #custom-r_end,
     #upower {
-        color: #a6d189;
+        color: #b8bb26;
     }
 
     #custom-l_end {
@@ -770,7 +772,7 @@
     }
 
     #custom-menu {
-        color: #E8EDF0;
+        color: #fbf1c7;
         background: rgba(23, 23, 23, 0.0);
         opacity: 0.1;
     }
@@ -789,13 +791,13 @@
         min-height: 10px;
         margin-bottom: -4px;
         border-radius: 8px;
-        background: #343434;
+        background: #504945;
     }
 
     #backlight-slider highlight,
     #pulseaudio-slider highlight {
         border-radius: 8px;
-        background-color: #2096C0;
+        background-color: #83a598;
     }
   '';
 
@@ -803,7 +805,7 @@
   programs.helix = {
     enable = true;
     settings = {
-      theme = "base16_default";
+      theme = "gruvbox_dark_soft";
       editor = {
         "line-number" = "relative";
         mouse = true;
@@ -1009,7 +1011,7 @@
         horizontal_padding = 8
         text_icon_padding = 0
         frame_width = 3
-        frame_color = "#aaaaaa"
+        frame_color = "#458588"
         gap_size = 0
         separator_color = frame
         sort = yes
@@ -1053,22 +1055,24 @@
         enable_pcre_regex = false
 
     [urgency_low]
-        background = "#222222"
-        foreground = "#888888"
+        background = "#1d2021"
+        foreground = "#a89984"
+        frame_color = "#665c54"
         timeout = 10
         default_icon = dialog-information
 
     [urgency_normal]
-        background = "#285577"
-        foreground = "#ffffff"
+        background = "#1d2021"
+        foreground = "#ebdbb2"
+        frame_color = "#458588"
         timeout = 10
         override_pause_level = 30
         default_icon = dialog-information
 
     [urgency_critical]
-        background = "#900000"
-        foreground = "#ffffff"
-        frame_color = "#ff0000"
+        background = "#1d2021"
+        foreground = "#fb4934"
+        frame_color = "#fb4934"
         timeout = 0
         override_pause_level = 60
         default_icon = dialog-warning
@@ -1101,59 +1105,32 @@
   '';
 
   # ── Waypaper ──────────────────────────────────────────────────────────────
-  xdg.configFile."waypaper/config.ini".text = ''
-    [Settings]
-    language = en
-    folder = ~/wallpapers
-    monitors = All,eDP-1
-    wallpaper = ~/wallpapers/Screenshot 2025-09-30 at 01-20-21 Serious Girl Live Wallpaper.png,~/wallpapers/Screenshot 2025-09-30 at 01-20-21 Serious Girl Live Wallpaper.png
-    show_path_in_tooltip = True
-    backend = swww
-    fill = fill
-    sort = name
-    color = #ffffff
-    subfolders = False
-    all_subfolders = False
-    show_hidden = False
-    show_gifs_only = False
-    zen_mode = False
-    post_command =
-    number_of_columns = 3
-    swww_transition_type = any
-    swww_transition_step = 90
-    swww_transition_angle = 0
-    swww_transition_duration = 2
-    swww_transition_fps = 60
-    mpvpaper_sound = False
-    mpvpaper_options =
-    use_xdg_state = False
-  '';
 
   # ── Yazi ──────────────────────────────────────────────────────────────────
   xdg.configFile."yazi/yazi.toml".text = ''
     [opener]
     image = [{ run = "feh %s", block = false, for = "unix" }]
     pdf   = [{ run = "zathura %s", block = false, for = "unix" }]
-    video = [{ run = "mpv --no-terminal %s", block = true, for = "unix" }]
+    video = [{ run = "env -u LD_LIBRARY_PATH mpv --no-terminal %s", orphan = true, for = "unix" }]
     text  = [{ run = "hx %s", block = true, for = "unix" }]
-    play  = [{ run = "mpv --no-terminal %s", block = true, for = "unix" }]
+    play  = [{ run = "env -u LD_LIBRARY_PATH mpv --no-terminal %s", orphan = true, for = "unix" }]
 
     [open]
     prepend_rules = [
       { mime = "image/*",        use = "image" },
       { mime = "application/pdf", use = "pdf"  },
       { mime = "video/*",        use = "video" },
+      { mime = "audio/*",        use = "play"  },
       { mime = "text/*",         use = "text"  },
-      { mime = "audio/opus",     use = "play"  },
-      { mime = "audio/mpeg",     use = "play"  },
-      { mime = "audio/flac",     use = "play"  },
     ]
 
     [manager]
     show_hidden = true
     sort_dir_first = true
+  '';
 
-    [keymap.manager]
+  xdg.configFile."yazi/keymap.toml".text = ''
+    [manager]
     prepend_keymap = [
       { on = "S", run = 'shell --block --confirm "rg --line-number --color=always . | fzf"', desc = "ripgrep + fzf search" },
       { on = "F", run = 'shell --block --confirm "fd . | fzf | xargs -r hx"', desc = "fzf → open in helix" },

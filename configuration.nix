@@ -1,6 +1,6 @@
 # Hardware: Intel i5-10310U, Intel UHD, Wayland/Hyprland, ext4
 # Deploy: sudo nixos-rebuild switch --flake .#tiago
-{ config, pkgs, ... }:
+{ config, pkgs, pkgs-unstable, planit, ... }:
 {
   imports = [ ./hardware-configuration.nix ];
 
@@ -11,6 +11,15 @@
 
   networking.hostName = "tiago";
   networking.networkmanager.enable = true;
+
+  # OpenSSH server: accept incoming SSH, KEY-ONLY (no password). Opens port 22
+  # (openFirewall defaults to true). Authorize client keys declaratively with
+  # users.users.tiago.openssh.authorizedKeys.keys = [ "ssh-ed25519 AAAA..." ];
+  services.openssh = {
+    enable = true;
+    settings.PasswordAuthentication = false;
+    settings.KbdInteractiveAuthentication = false;
+  };
 
   time.timeZone = "America/Sao_Paulo";
   i18n.defaultLocale = "pt_BR.UTF-8";
@@ -26,7 +35,7 @@
   hardware.graphics.enable = true;
 
   # PipeWire (replaces PulseAudio)
-  hardware.pulseaudio.enable = false;
+  services.pulseaudio.enable = false;
   security.rtkit.enable = true;
   services.pipewire = {
     enable = true;
@@ -37,6 +46,10 @@
 
   programs.hyprland.enable = true;
 
+  # dconf backs the gsettings keys (color-scheme / gtk-theme) that the
+  # theme-switch script sets, and that xdg-desktop-portal exposes to Firefox.
+  programs.dconf.enable = true;
+
   # add PATH
   environment.localBinInPath = true;
 
@@ -44,7 +57,7 @@
   services.greetd = {
     enable = true;
     settings.default_session.command =
-      "${pkgs.greetd.tuigreet}/bin/tuigreet --time --greeting 'gm' --cmd Hyprland";
+      "${pkgs.tuigreet}/bin/tuigreet --time --greeting 'gm' --cmd start-hyprland";
   };
 
   # Drawing tablet
@@ -58,7 +71,8 @@
 
   fonts.packages = with pkgs; [
     cascadia-code
-    (nerdfonts.override { fonts = [ "JetBrainsMono" "CascadiaCode" ]; })
+    nerd-fonts.jetbrains-mono
+    nerd-fonts.caskaydia-cove
   ];
 
   users.users.tiago = {
@@ -68,7 +82,7 @@
   };
 
   environment.systemPackages =
-  import ./packages.nix { inherit pkgs; };
+  import ./packages.nix { inherit pkgs pkgs-unstable; } ++ [ planit ];
 
   nixpkgs.config.allowUnfree = true;
   system.stateVersion = "24.11";

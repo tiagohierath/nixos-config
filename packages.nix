@@ -1,4 +1,4 @@
-{ pkgs }:
+{ pkgs, pkgs-unstable }:
 
 with pkgs; [
   git
@@ -19,4 +19,6 @@ with pkgs; [
   aerc
   newsboat
   audacious
+  pkgs-unstable.claude-code
 ]
+
