@@ -44,6 +44,33 @@
     pulse.enable = true;
   };
 
+  # Keep the fifine as the ONLY microphone: never auto-switch a bluetooth
+  # headphone into the headset (HFP/HSP) profile. It stays in A2DP (output only,
+  # for music/video), so it never exposes a mic and never steals the default
+  # source from the fifine.
+  services.pipewire.wireplumber.extraConfig."51-bluez-no-mic" = {
+    "monitor.bluez.properties" = {
+      "bluez5.autoswitch-profile" = false;
+    };
+  };
+
+  # Bluetooth — the headphone connects over A2DP for music/video. Experimental
+  # enables BLE battery reporting (read by the waybar headphone module via
+  # UPower); AutoEnable powers the adapter on boot so trusted devices reconnect.
+  hardware.bluetooth = {
+    enable = true;
+    powerOnBoot = true;
+    settings = {
+      General.Experimental = true;
+      Policy.AutoEnable = true;
+    };
+  };
+  services.blueman.enable = true;
+
+  # UPower daemon: exposes battery info (laptop + bluetooth) over D-Bus, which
+  # the waybar headphone-battery module queries.
+  services.upower.enable = true;
+
   programs.hyprland.enable = true;
 
   # dconf backs the gsettings keys (color-scheme / gtk-theme) that the

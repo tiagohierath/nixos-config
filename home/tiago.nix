@@ -1,4 +1,24 @@
 { config, pkgs, pkgs-unstable, lib, ... }:
+let
+  # Daily alarm: crank the sink to 90%, loop Nightmail until disarmed, then drop
+  # back to 20% so opening other apps later doesn't blast at full volume.
+  # Disarm with `pkill mpv` — mpv exits, the script continues, volume resets.
+  alarmScript = pkgs.writeShellScript "nightmail-alarm" ''
+    ${pkgs.pamixer}/bin/pamixer --set-volume 90
+    ${pkgs.mpv}/bin/mpv --no-terminal --no-video --volume=100 --loop=inf \
+      /home/tiago/projects/nightmail.mp3 || true
+    ${pkgs.pamixer}/bin/pamixer --set-volume 20
+  '';
+
+  # Waybar headphone battery: prints "🎧 NN%" when a bluetooth headphone is
+  # connected and reporting battery, otherwise nothing (so the module hides).
+  headphoneBattery = pkgs.writeShellScript "headphone-battery" ''
+    dev=$(${pkgs.upower}/bin/upower -e | ${pkgs.gnugrep}/bin/grep -m1 -iE 'headset|headphone') || exit 0
+    [ -z "$dev" ] && exit 0
+    ${pkgs.upower}/bin/upower -i "$dev" \
+      | ${pkgs.gawk}/bin/awk '/percentage:/ { gsub(/%/, "", $2); printf "🎧 %s%%\n", $2; exit }'
+  '';
+in
 {
   home.username = "tiago";
   home.homeDirectory = "/home/tiago";
@@ -29,8 +49,12 @@
 
     # Audio / brightness / media control
     pamixer
+    pavucontrol
     brightnessctl
     playerctl
+
+    # Battery info (laptop + bluetooth headphone) for waybar
+    upower
 
     # System tools
     udiskie
@@ -391,7 +415,7 @@
 
         "modules-left": ["custom/smallspacer","custom/oscomputer","hyprland/workspaces","custom/spacer","hyprland/window"],
         "modules-center": ["custom/padd","custom/l_end","custom/r_end","mpris","custom/padd"],
-        "modules-right": ["custom/padd","custom/l_end","group/expand","custom/spacer","custom/bitcoin","custom/spacer","custom/weather","custom/spacer","network","custom/spacer","group/expand-3","custom/spacer","group/expand-2","custom/spacer","group/expand-4","custom/spacer","custom/date","custom/spacer","clock","custom/spacer","custom/notification","custom/padd"],
+        "modules-right": ["custom/padd","custom/l_end","group/expand","custom/spacer","custom/bitcoin","custom/spacer","custom/weather","custom/spacer","network","custom/spacer","group/expand-3","custom/spacer","custom/headphone","custom/spacer","group/expand-2","custom/spacer","custom/date","custom/spacer","clock","custom/spacer","custom/notification","custom/padd"],
 
         "custom/smallspacer": { "format": " " },
 
@@ -472,30 +496,11 @@
             "ignore-workspaces": ["5","6","7","8","9","10"]
         },
 
-        "upower": {
-            "icon-size": 20,
-            "format": "",
-            "format-alt": "{}<span color='orange'>[{time}]</span>",
-            "tooltip": true,
-            "tooltip-spacing": 20
-        },
-
-        "upower#headset": {
-            "format": " {percentage}",
-            "native-path": "/org/freedesktop/UPower/devices/headset_dev_A6_98_9A_0D_D3_49",
-            "show-icon": false,
+        "custom/headphone": {
+            "exec": "${headphoneBattery}",
+            "format": "{}",
+            "interval": 15,
             "tooltip": false
-        },
-
-        "group/expand-4": {
-            "orientation": "horizontal",
-            "drawer": {
-                "transition-duration": 600,
-                "children-class": "not-power",
-                "transition-to-left": true,
-                "click-to-reveal": true
-            },
-            "modules": ["upower","upower#headset"]
         },
 
         "idle_inhibitor": {
@@ -725,6 +730,15 @@
         padding-right: 3px;
     }
 
+    #custom-headphone {
+        font-weight: normal;
+        font-size: 15px;
+        color: #8ec07c;
+        background: rgba(23, 23, 23, 0.0);
+        padding-left: 3px;
+        padding-right: 3px;
+    }
+
     #network {
         color: #ebdbb2;
         font-weight: normal;
@@ -754,8 +768,7 @@
     }
 
     #custom-l_end,
-    #custom-r_end,
-    #upower {
+    #custom-r_end {
         color: #b8bb26;
     }
 
@@ -898,6 +911,27 @@
           name "PipeWire"
       }
     '';
+  };
+
+  # ── Nightmail alarm ────────────────────────────────────────────────────────
+  # Plays Nightmail at 04:00 every day (90% → loop → 20% on disarm). Disarm with
+  # `pkill mpv`. Not persistent: a missed alarm (laptop off at 04:00) is never
+  # replayed on next boot. See /home/tiago/projects/alarm.md.
+  systemd.user.services."nightmail-alarm" = {
+    Unit.Description = "Nightmail daily alarm";
+    Service = {
+      Type = "simple";
+      ExecStart = "${alarmScript}";
+    };
+  };
+
+  systemd.user.timers."nightmail-alarm" = {
+    Unit.Description = "Trigger Nightmail alarm at 04:00 daily";
+    Timer = {
+      OnCalendar = "*-*-* 04:00:00";
+      Persistent = false;
+    };
+    Install.WantedBy = [ "timers.target" ];
   };
 
   # ── Btop ──────────────────────────────────────────────────────────────────
