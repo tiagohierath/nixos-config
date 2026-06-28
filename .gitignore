@@ -1,0 +1,11 @@
+# secrets / never commit
+*.age
+*.key
+*.pem
+secrets.nix
+secrets/
+.env
+
+# nix build outputs
+result
+result-*
