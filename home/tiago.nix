@@ -189,12 +189,13 @@ in
       }
 
       animations {
-          enabled = false
+          enabled = true
           bezier = niercurve, 0.4, 0, 0.2, 1
-          animation = windows,      1, 1, niercurve, slide
-          animation = windowsOut,   1, 1, niercurve, slide
-          animation = fade,         1, 1, niercurve
-          animation = workspaces,   1, 1, niercurve, slidevert
+          bezier = snappy,    0.2, 0.9, 0.1, 1
+          animation = windows,      1, 2, snappy, slide
+          animation = windowsOut,   1, 2, snappy, slide
+          animation = fade,         1, 2, snappy
+          animation = workspaces,   1, 2, snappy, slidevert
       }
 
       dwindle {
@@ -922,13 +923,14 @@ in
     };
   };
 
+  # Disabled 2026-06-28. Re-enable by restoring Install.WantedBy = [ "timers.target" ].
   systemd.user.timers."nightmail-alarm" = {
     Unit.Description = "Trigger Nightmail alarm at 04:00 daily";
     Timer = {
       OnCalendar = "*-*-* 04:00:00";
       Persistent = false;
     };
-    Install.WantedBy = [ "timers.target" ];
+    Install.WantedBy = [ ];
   };
 
   # ── Btop ──────────────────────────────────────────────────────────────────

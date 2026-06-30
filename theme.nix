@@ -118,8 +118,7 @@ let
     }
 
     #workspaces button.active {
-        color: #${p.fg};
-        transition: all 0.3s ease;
+        color: #${p.orange};
         padding-left: 4px;
         padding-right: 4px;
     }
