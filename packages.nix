@@ -19,7 +19,6 @@ with pkgs; [
   newsboat
   audacious
   aerc
-  mypaint
   pkgs-unstable.claude-code
 ]
 
