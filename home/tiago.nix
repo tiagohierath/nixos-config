@@ -169,7 +169,8 @@ in
       }
 
       decoration {
-          rounding = 7
+          rounding = 10
+          rounding_power = 8.0
           active_opacity = 1
           inactive_opacity = 1
 

@@ -16,10 +16,10 @@ with pkgs; [
   audacity
   qbittorrent
   man
-  aerc
   newsboat
   audacious
   aerc
+  mypaint
   pkgs-unstable.claude-code
 ]
 
