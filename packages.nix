@@ -21,5 +21,6 @@ with pkgs; [
   aerc
   pkgs-unstable.claude-code
   krita
+  openssl
 ]
 
