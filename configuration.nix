@@ -9,6 +9,14 @@
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
+  # Early KMS: GPU driver loads in the initrd, so console/greeter come up at
+  # native resolution instead of after the root switch
+  boot.initrd.kernelModules = [ "i915" ];
+
+  # ext4 defaults to relatime, which writes metadata on reads; noatime skips
+  # that (merges into the fileSystems."/" from hardware-configuration.nix)
+  fileSystems."/".options = [ "noatime" ];
+
   networking.hostName = "tiago";
   networking.networkmanager.enable = true;
 
@@ -32,7 +40,20 @@
     variant = "abnt2";
   };
 
-  hardware.graphics.enable = true;
+  # VA-API hardware video decode/encode on the UHD 620 (iHD driver). mpv picks
+  # it up with hwdec=auto-safe; Firefox needs media.ffmpeg.vaapi.enabled=true.
+  hardware.graphics = {
+    enable = true;
+    extraPackages = with pkgs; [ intel-media-driver ];
+  };
+
+  # Proactive thermal management for the U-series CPU — keeps sustained clocks
+  # higher under load instead of hitting firmware throttle cliffs
+  services.thermald.enable = true;
+
+  # Energy profiles (power-saver / balanced / performance), switched with the
+  # p1/p2/p3 bash aliases (see home/tiago.nix) or powerprofilesctl directly
+  services.power-profiles-daemon.enable = true;
 
   # PipeWire (replaces PulseAudio)
   services.pulseaudio.enable = false;

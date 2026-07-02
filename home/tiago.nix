@@ -117,6 +117,12 @@ in
   
   programs.bash = {
   enable = true;
+  # energy profiles, lowest → highest power
+  shellAliases = {
+    p1 = "powerprofilesctl set power-saver";
+    p2 = "powerprofilesctl set balanced";
+    p3 = "powerprofilesctl set performance";
+  };
   initExtra = ''
     export PATH="$HOME/.local/bin:$PATH"
   '';
@@ -404,6 +410,9 @@ in
     config = {
       loop = "inf";
       "background-color" = "#454545";
+      # VA-API decode on the iGPU (driver from hardware.graphics.extraPackages);
+      # auto-safe falls back to software for codecs the UHD 620 can't do
+      hwdec = "auto-safe";
     };
   };
 
