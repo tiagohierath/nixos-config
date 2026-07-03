@@ -22,5 +22,6 @@ with pkgs; [
   pkgs-unstable.claude-code
   krita
   openssl
+  retroarch
 ]
 
