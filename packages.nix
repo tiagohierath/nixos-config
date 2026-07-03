@@ -20,7 +20,6 @@ with pkgs; [
   audacious
   aerc
   pkgs-unstable.claude-code
-  krita
   openssl
 ]
 
