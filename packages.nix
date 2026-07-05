@@ -26,5 +26,7 @@ with pkgs; [
   rnote
   azpainter
   opencode
+  pkgs-unstable.claude-code
+  snes9x
 ]
 
