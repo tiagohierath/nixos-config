@@ -19,10 +19,13 @@ with pkgs; [
   newsboat
   audacious
   aerc
+  khard
   pkgs-unstable.claude-code
   openssl
   ani-cli
   mypaint
   rnote
   azpainter
+  opencode
 ]
+
