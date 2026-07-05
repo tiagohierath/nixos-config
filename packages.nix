@@ -20,7 +20,6 @@ with pkgs; [
   audacious
   aerc
   khard
-  pkgs-unstable.claude-code
   openssl
   ani-cli
   mypaint
