@@ -127,5 +127,6 @@ it can't coexist with HM owning the dotfiles; this gives the same result declara
 - **Local machine (NixOS) is 100% declarative** — no `.env` files locally, no imperative setup.
   All config lives in `.nix` files or version-controlled files. `.env` files are only for the
   VPS where runtime secrets are needed.
-- Umami analytics at `umami.navylily.tv` — runs on the VPS (Node.js + PostgreSQL native,
-  exposed via Cloudflare Tunnel). Deploy files in `navylily/umami/deploy/`.
+- **GoatCounter analytics** at `stats.navylily.tv` — single Go binary + SQLite on VPS,
+  exposed via Cloudflare Tunnel. Tracks 4 custom events only (cta-home, cta-pricing,
+  checkout-start, purchase). No pageview tracking.
