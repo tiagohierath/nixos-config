@@ -6,6 +6,19 @@
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
+  # MyPaint 2.0.1 crashes on startup with pygobject >= 3.51: plain (non-GType)
+  # GLib enums like GLib.UserDirectory no longer have .value_name. Only used
+  # in a debug log line, so log the enum itself instead.
+  nixpkgs.overlays = [
+    (final: prev: {
+      mypaint = prev.mypaint.overrideAttrs (old: {
+        postPatch = (old.postPatch or "") + ''
+          substituteInPlace lib/glib.py --replace-fail "k.value_name," "k,"
+        '';
+      });
+    })
+  ];
+
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
@@ -30,8 +43,7 @@
   };
 
   time.timeZone = "America/Sao_Paulo";
-  i18n.defaultLocale = "pt_BR.UTF-8";
-  i18n.extraLocaleSettings.LC_TIME = "pt_BR.UTF-8";
+  i18n.defaultLocale = "en_US.UTF-8";
 
   # ABNT2 keyboard for TTY and greeter
   console.keyMap = "br-abnt2";

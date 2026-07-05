@@ -256,6 +256,7 @@ in
       bind = SUPER, S, exec, sh -c 'notify-send "Sats" "$(sat "$(wl-paste -p)")"'
       bind = SUPER, T, exec, sh -c 'cliphist list | fuzzel --dmenu | cliphist decode | wl-copy'
       bind = SUPER, Print, exec, grimblast --freeze copysave area
+      bind = SUPER, O, exec, grimblast --freeze copy area
 
       bind = $mainMod, H, workspace, 1
       bind = $mainMod, J, workspace, 2

@@ -26,4 +26,3 @@ with pkgs; [
   rnote
   azpainter
 ]
-
