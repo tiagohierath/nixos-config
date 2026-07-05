@@ -119,3 +119,13 @@ it can't coexist with HM owning the dotfiles; this gives the same result declara
 - `hardware-configuration.nix` is auto-generated; never hand-edit.
 - neovim's lazy.nvim/mason setup is the one non-pure escape hatch (downloads at runtime).
 - A few mime handlers (vesktop, thunderbird) point to apps not declared in packages.
+
+## VPS / Server
+
+- **Ubuntu VPS** for hosting navylily.tv and other services.
+- **No Docker ever** — deploy services natively on Ubuntu (systemd, nginx, postgres, etc.).
+- **Local machine (NixOS) is 100% declarative** — no `.env` files locally, no imperative setup.
+  All config lives in `.nix` files or version-controlled files. `.env` files are only for the
+  VPS where runtime secrets are needed.
+- Umami analytics at `umami.navylily.tv` — runs on the VPS (Node.js + PostgreSQL native,
+  exposed via Cloudflare Tunnel). Deploy files in `navylily/umami/deploy/`.
