@@ -29,6 +29,7 @@ with pkgs; [
   pkgs-unstable.claude-code
   pkgs-unstable.localsend
   imagemagick
+  zed-editor
 ]
 
 
