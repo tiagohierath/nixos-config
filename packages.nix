@@ -27,6 +27,7 @@ with pkgs; [
   azpainter
   opencode
   pkgs-unstable.claude-code
+  localsend
 ]
 
 
