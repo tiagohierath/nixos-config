@@ -28,6 +28,7 @@ with pkgs; [
   opencode
   pkgs-unstable.claude-code
   pkgs-unstable.localsend
+  imagemagick
 ]
 
 
