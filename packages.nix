@@ -28,6 +28,7 @@ with pkgs; [
   pkgs-unstable.localsend
   imagemagick
   zed-editor
+  go
 ]
 
 
