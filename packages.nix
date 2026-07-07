@@ -25,8 +25,6 @@ with pkgs; [
   mypaint
   rnote
   azpainter
-  opencode
-  pkgs-unstable.claude-code
   pkgs-unstable.localsend
   imagemagick
   zed-editor
