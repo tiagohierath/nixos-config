@@ -29,6 +29,7 @@ with pkgs; [
   imagemagick
   zed-editor
   go
+  gopls
 ]
 
 
