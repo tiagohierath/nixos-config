@@ -104,6 +104,10 @@
   # D-Bus, read by the waybar audio module for its tooltip.
   services.upower.enable = true;
 
+  # gvfs backs Nautilus's virtual filesystems: trash://, MTP, network mounts.
+  # Without it "Move to Trash" is missing/greyed out in the file manager.
+  services.gvfs.enable = true;
+
   programs.hyprland.enable = true;
 
   # dconf backs the gsettings keys (color-scheme / gtk-theme) that the
