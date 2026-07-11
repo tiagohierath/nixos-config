@@ -114,6 +114,11 @@
   # theme-switch script sets, and that xdg-desktop-portal exposes to Firefox.
   programs.dconf.enable = true;
 
+  # Expose gsettings schemas at /run/current-system/sw/share/gsettings-schemas
+  # so ~/.local/bin/theme-switch can put them on XDG_DATA_DIRS (gsettings
+  # errors with "No such schema" otherwise).
+  environment.pathsToLink = [ "/share/gsettings-schemas" ];
+
   # add PATH
   environment.localBinInPath = true;
 
