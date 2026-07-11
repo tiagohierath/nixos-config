@@ -22,7 +22,6 @@ with pkgs; [
   khard
   openssl
   ani-cli
-  mypaint
   rnote
   azpainter
   pkgs-unstable.localsend
