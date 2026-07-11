@@ -30,7 +30,7 @@ with pkgs; [
   zed-editor
   go
   gopls
-  bottles
+  pkgs-unstable.bottles
 
   # ── Moved here from home-manager (2026-07-10) ──────────────────────────────
   # Wayland / Hyprland ecosystem
