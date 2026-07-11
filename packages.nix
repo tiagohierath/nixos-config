@@ -30,7 +30,7 @@ with pkgs; [
   go
   gopls
   libresprite
-  pkgs-unstable.aseprite
+  aseprite
 
   # ── Moved here from home-manager (2026-07-10) ──────────────────────────────
   # Wayland / Hyprland ecosystem
