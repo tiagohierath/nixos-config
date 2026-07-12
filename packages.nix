@@ -9,7 +9,9 @@ with pkgs; [
   ffmpeg
   pkgs-unstable.yt-dlp
   helix
-  zathura
+  (zathura.override {
+    plugins = [ zathuraPkgs.zathura_pdf_mupdf zathuraPkgs.zathura_ps ];
+  })
   baobab
   nautilus
   systemd
