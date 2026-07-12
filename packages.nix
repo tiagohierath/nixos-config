@@ -33,6 +33,7 @@ with pkgs; [
   gopls
   pkgs-unstable.aseprite
   vlc
+  calibre
 
   # ── Moved here from home-manager (2026-07-10) ──────────────────────────────
   # Wayland / Hyprland ecosystem
