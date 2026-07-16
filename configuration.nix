@@ -155,18 +155,19 @@
 
   # Auto shutdown at 9pm: one root service handles warnings, the
   # cancellation check, and the final poweroff. Touch
-  # /run/shutdown-cancel any time before 9pm to cancel that night's
-  # shutdown.
+  # /run/user/1000/shutdown-cancel any time before 9pm to cancel that
+  # night's shutdown. Notify failures (e.g. no active session) must
+  # not block the poweroff, hence the `|| true`.
   systemd.services.nightly-shutdown = {
     description = "Warn, then power off the machine at 9pm (cancellable)";
     serviceConfig.Type = "oneshot";
     script = ''
-      cancel_flag=/run/shutdown-cancel
+      cancel_flag=/run/user/1000/shutdown-cancel
       notify() {
         ${pkgs.util-linux}/bin/runuser -u tiago -- \
           env XDG_RUNTIME_DIR=/run/user/1000 \
               DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1000/bus \
-              ${pkgs.libnotify}/bin/notify-send "$1"
+              ${pkgs.libnotify}/bin/notify-send "$1" || true
       }
       check_cancel() {
         if [ -e "$cancel_flag" ]; then
