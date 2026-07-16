@@ -153,49 +153,49 @@
   environment.systemPackages =
   import ./packages.nix { inherit pkgs pkgs-unstable; } ++ [ planit ];
 
-  # Auto shutdown at 9pm, with 3 warnings in the preceding 30 minutes
-  systemd.services.shutdown-warning = {
-    description = "Warn before nightly auto shutdown";
-    serviceConfig = {
-      Type = "oneshot";
-      User = "tiago";
-      Environment = [
-        "XDG_RUNTIME_DIR=/run/user/1000"
-        "DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1000/bus"
-      ];
-    };
+  # Auto shutdown at 9pm: one root service handles warnings, the
+  # cancellation check, and the final poweroff. Touch
+  # /run/shutdown-cancel any time before 9pm to cancel that night's
+  # shutdown.
+  systemd.services.nightly-shutdown = {
+    description = "Warn, then power off the machine at 9pm (cancellable)";
+    serviceConfig.Type = "oneshot";
     script = ''
-      ${pkgs.libnotify}/bin/notify-send "Shutdown in 30 minutes"
+      cancel_flag=/run/shutdown-cancel
+      notify() {
+        ${pkgs.util-linux}/bin/runuser -u tiago -- \
+          env XDG_RUNTIME_DIR=/run/user/1000 \
+              DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1000/bus \
+              ${pkgs.libnotify}/bin/notify-send "$1"
+      }
+      check_cancel() {
+        if [ -e "$cancel_flag" ]; then
+          notify "Shutdown cancelled"
+          rm -f "$cancel_flag"
+          exit 0
+        fi
+      }
+
+      notify "Shutdown in 30 minutes (touch $cancel_flag to cancel)"
       sleep 900
-      ${pkgs.libnotify}/bin/notify-send "Shutdown in 15 minutes"
+      check_cancel
+      notify "Shutdown in 15 minutes"
       sleep 840
-      ${pkgs.libnotify}/bin/notify-send "Shutdown in 1 minute"
+      check_cancel
+      notify "Shutdown in 1 minute"
       sleep 60
+      check_cancel
+
+      systemctl poweroff
     '';
   };
 
-  systemd.timers.shutdown-warning = {
-    description = "Trigger shutdown warnings at 8:30pm";
+  systemd.timers.nightly-shutdown = {
+    description = "Trigger nightly-shutdown at 8:30pm";
     wantedBy = [ "timers.target" ];
     timerConfig = {
-      OnCalendar = "20:30";
+      OnCalendar = "*-*-* 20:30:00";
       Persistent = false;
-    };
-  };
-
-  systemd.timers.auto-poweroff = {
-    description = "Power off the machine at 9pm";
-    wantedBy = [ "timers.target" ];
-    timerConfig = {
-      OnCalendar = "21:00";
-      Persistent = false;
-    };
-  };
-  systemd.services.auto-poweroff = {
-    description = "Power off the machine";
-    serviceConfig = {
-      Type = "oneshot";
-      ExecStart = "${pkgs.systemd}/bin/systemctl poweroff";
     };
   };
 
