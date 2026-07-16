@@ -163,6 +163,9 @@
     serviceConfig.Type = "oneshot";
     script = ''
       cancel_flag=/run/user/1000/shutdown-cancel
+      start_epoch=$(date +%s)
+      max_drift=300
+
       notify() {
         ${pkgs.util-linux}/bin/runuser -u tiago -- \
           env XDG_RUNTIME_DIR=/run/user/1000 \
@@ -176,15 +179,40 @@
           exit 0
         fi
       }
+      # Bail out (no notify, no poweroff) if the wall clock has
+      # jumped further than expected since we started, which happens
+      # when the machine was suspended (lid closed) mid-sequence and
+      # only just woke up. This stops a lid reopen at 2am from
+      # triggering the sequence hours late.
+      check_drift() {
+        expected=$1
+        now=$(date +%s)
+        elapsed=$((now - start_epoch))
+        diff=$((elapsed - expected))
+        [ "$diff" -lt 0 ] && diff=$((-diff))
+        if [ "$diff" -gt "$max_drift" ]; then
+          exit 0
+        fi
+      }
+      # Also bail if this run itself started way outside the 20:30
+      # target (e.g. the machine was suspended straight through 20:30
+      # and this only fires because it woke up later).
+      now_hm=$((10#$(date +%H%M)))
+      if [ "$now_hm" -lt 2025 ] || [ "$now_hm" -gt 2100 ]; then
+        exit 0
+      fi
 
       notify "Shutdown in 30 minutes (touch $cancel_flag to cancel)"
       sleep 900
+      check_drift 900
       check_cancel
       notify "Shutdown in 15 minutes"
       sleep 840
+      check_drift 1740
       check_cancel
       notify "Shutdown in 1 minute"
       sleep 60
+      check_drift 1800
       check_cancel
 
       systemctl poweroff
