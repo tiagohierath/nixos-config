@@ -153,6 +153,52 @@
   environment.systemPackages =
   import ./packages.nix { inherit pkgs pkgs-unstable; } ++ [ planit ];
 
+  # Auto shutdown at 9pm, with 3 warnings in the preceding 30 minutes
+  systemd.services.shutdown-warning = {
+    description = "Warn before nightly auto shutdown";
+    serviceConfig = {
+      Type = "oneshot";
+      User = "tiago";
+      Environment = [
+        "XDG_RUNTIME_DIR=/run/user/1000"
+        "DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1000/bus"
+      ];
+    };
+    script = ''
+      ${pkgs.libnotify}/bin/notify-send "Shutdown in 30 minutes"
+      sleep 900
+      ${pkgs.libnotify}/bin/notify-send "Shutdown in 15 minutes"
+      sleep 840
+      ${pkgs.libnotify}/bin/notify-send "Shutdown in 1 minute"
+      sleep 60
+    '';
+  };
+
+  systemd.timers.shutdown-warning = {
+    description = "Trigger shutdown warnings at 8:30pm";
+    wantedBy = [ "timers.target" ];
+    timerConfig = {
+      OnCalendar = "20:30";
+      Persistent = false;
+    };
+  };
+
+  systemd.timers.auto-poweroff = {
+    description = "Power off the machine at 9pm";
+    wantedBy = [ "timers.target" ];
+    timerConfig = {
+      OnCalendar = "21:00";
+      Persistent = false;
+    };
+  };
+  systemd.services.auto-poweroff = {
+    description = "Power off the machine";
+    serviceConfig = {
+      Type = "oneshot";
+      ExecStart = "${pkgs.systemd}/bin/systemctl poweroff";
+    };
+  };
+
   nixpkgs.config.allowUnfree = true;
   system.stateVersion = "24.11";
 }
