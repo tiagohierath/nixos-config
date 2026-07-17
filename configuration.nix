@@ -228,6 +228,46 @@
     };
   };
 
+  # Sunset dimming: at 7pm, drop the backlight to its lowest usable
+  # level (screen stays visible, just not lit at full brightness).
+  systemd.services.sunset-dim = {
+    description = "Dim screen to minimum brightness at sunset";
+    serviceConfig.Type = "oneshot";
+    script = ''
+      ${pkgs.brightnessctl}/bin/brightnessctl set 1%
+    '';
+  };
+
+  systemd.timers.sunset-dim = {
+    description = "Trigger sunset-dim at 7pm";
+    wantedBy = [ "timers.target" ];
+    timerConfig = {
+      OnCalendar = "*-*-* 19:00:00";
+      Persistent = false;
+    };
+  };
+
+  # Morning reset: undo sunset-dim so the screen isn't stuck dark,
+  # whether the laptop stayed on overnight or was rebooted (NixOS's
+  # systemd-backlight service would otherwise restore the dimmed
+  # level on every boot).
+  systemd.services.sunrise-brighten = {
+    description = "Restore full brightness in the morning";
+    serviceConfig.Type = "oneshot";
+    script = ''
+      ${pkgs.brightnessctl}/bin/brightnessctl set 100%
+    '';
+  };
+
+  systemd.timers.sunrise-brighten = {
+    description = "Trigger sunrise-brighten at 7am";
+    wantedBy = [ "timers.target" ];
+    timerConfig = {
+      OnCalendar = "*-*-* 07:00:00";
+      Persistent = true;
+    };
+  };
+
   nixpkgs.config.allowUnfree = true;
   system.stateVersion = "24.11";
 }
