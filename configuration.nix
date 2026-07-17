@@ -228,12 +228,26 @@
     };
   };
 
-  # Sunset dimming: at 7pm, drop the backlight to its lowest usable
-  # level (screen stays visible, just not lit at full brightness).
+  # Sunset dimming: at 7pm, switch to dark theme (waybar, wallpaper,
+  # GTK, kitty, etc. via theme-switch, same as Super+I) and drop the
+  # backlight to its lowest usable level. theme-switch needs the
+  # user's Wayland/D-Bus session env to reach hyprctl/gsettings/waybar.
   systemd.services.sunset-dim = {
-    description = "Dim screen to minimum brightness at sunset";
+    description = "Switch to dark theme and dim screen at sunset";
     serviceConfig.Type = "oneshot";
+    path = [ pkgs.util-linux pkgs.procps pkgs.gnugrep pkgs.gawk ];
     script = ''
+      hypr_pid=$(pgrep -x Hyprland | head -1)
+      if [ -n "$hypr_pid" ]; then
+        wayland_display=$(tr '\0' '\n' < /proc/$hypr_pid/environ | grep -m1 '^WAYLAND_DISPLAY=' | cut -d= -f2-)
+        hypr_sig=$(tr '\0' '\n' < /proc/$hypr_pid/environ | grep -m1 '^HYPRLAND_INSTANCE_SIGNATURE=' | cut -d= -f2-)
+        runuser -u tiago -- \
+          env XDG_RUNTIME_DIR=/run/user/1000 \
+              WAYLAND_DISPLAY="$wayland_display" \
+              HYPRLAND_INSTANCE_SIGNATURE="$hypr_sig" \
+              DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1000/bus \
+              /home/tiago/.local/bin/theme-switch dark || true
+      fi
       ${pkgs.brightnessctl}/bin/brightnessctl set 1%
     '';
   };
@@ -252,10 +266,22 @@
   # systemd-backlight service would otherwise restore the dimmed
   # level on every boot).
   systemd.services.sunrise-brighten = {
-    description = "Restore full brightness in the morning";
+    description = "Switch to light theme and restore full brightness in the morning";
     serviceConfig.Type = "oneshot";
+    path = [ pkgs.util-linux pkgs.procps pkgs.gnugrep pkgs.gawk ];
     script = ''
       ${pkgs.brightnessctl}/bin/brightnessctl set 100%
+      hypr_pid=$(pgrep -x Hyprland | head -1)
+      if [ -n "$hypr_pid" ]; then
+        wayland_display=$(tr '\0' '\n' < /proc/$hypr_pid/environ | grep -m1 '^WAYLAND_DISPLAY=' | cut -d= -f2-)
+        hypr_sig=$(tr '\0' '\n' < /proc/$hypr_pid/environ | grep -m1 '^HYPRLAND_INSTANCE_SIGNATURE=' | cut -d= -f2-)
+        runuser -u tiago -- \
+          env XDG_RUNTIME_DIR=/run/user/1000 \
+              WAYLAND_DISPLAY="$wayland_display" \
+              HYPRLAND_INSTANCE_SIGNATURE="$hypr_sig" \
+              DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1000/bus \
+              /home/tiago/.local/bin/theme-switch light || true
+      fi
     '';
   };
 
