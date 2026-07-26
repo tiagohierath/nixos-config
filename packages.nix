@@ -36,6 +36,7 @@ with pkgs; [
   vlc
   calibre
   wf-recorder
+  slurp
 
 
   # ── Moved here from home-manager (2026-07-10) ──────────────────────────────
