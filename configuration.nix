@@ -194,25 +194,36 @@
           exit 0
         fi
       }
-      # Also bail if this run itself started way outside the 20:30
-      # target (e.g. the machine was suspended straight through 20:30
-      # and this only fires because it woke up later).
-      now_hm=$((10#$(date +%H%M)))
-      if [ "$now_hm" -lt 2025 ] || [ "$now_hm" -gt 2100 ]; then
-        exit 0
-      fi
+      # Bail if the current time-of-day has drifted outside the
+      # shutdown window. `sleep` pauses during suspend and resumes
+      # counting on wake, so check_drift's elapsed-time math alone
+      # can't reliably catch a suspend that spans into the next
+      # morning: a resume timed just right can still land within
+      # the expected drift budget and let the sequence complete
+      # while you're back at the machine. Re-validate the actual
+      # clock at every stage, not just total elapsed time.
+      check_window() {
+        now_hm=$((10#$(date +%H%M)))
+        if [ "$now_hm" -lt 2025 ] || [ "$now_hm" -gt 2110 ]; then
+          exit 0
+        fi
+      }
+      check_window
 
       notify "Shutdown in 30 minutes (touch $cancel_flag to cancel)"
       sleep 900
       check_drift 900
+      check_window
       check_cancel
       notify "Shutdown in 15 minutes"
       sleep 840
       check_drift 1740
+      check_window
       check_cancel
       notify "Shutdown in 1 minute"
       sleep 60
       check_drift 1800
+      check_window
       check_cancel
 
       systemctl poweroff

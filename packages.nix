@@ -10,7 +10,8 @@ with pkgs; [
   pkgs-unstable.yt-dlp
   helix
   (zathura.override {
-    plugins = [ zathuraPkgs.zathura_pdf_mupdf zathuraPkgs.zathura_ps ];
+    # zathura_cb handles comic archives: .cbz/.cbr/.cb7/.cbt
+    plugins = [ zathuraPkgs.zathura_pdf_mupdf zathuraPkgs.zathura_ps zathuraPkgs.zathura_cb ];
   })
   baobab
   nautilus
@@ -34,6 +35,8 @@ with pkgs; [
   pkgs-unstable.aseprite
   vlc
   calibre
+  wf-recorder
+
 
   # ── Moved here from home-manager (2026-07-10) ──────────────────────────────
   # Wayland / Hyprland ecosystem
