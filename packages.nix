@@ -37,6 +37,7 @@ with pkgs; [
   calibre
   wf-recorder
   slurp
+  gimp
 
 
   # ── Moved here from home-manager (2026-07-10) ──────────────────────────────
