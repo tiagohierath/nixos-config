@@ -24,9 +24,6 @@ with pkgs; [
   aerc
   khard
   openssl
-  ani-cli
-  rnote
-  azpainter
   pkgs-unstable.localsend
   imagemagick
   zed-editor
@@ -38,6 +35,7 @@ with pkgs; [
   wf-recorder
   slurp
   gimp
+  blender
 
 
   # ── Moved here from home-manager (2026-07-10) ──────────────────────────────
