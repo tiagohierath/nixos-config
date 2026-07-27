@@ -35,7 +35,8 @@ with pkgs; [
   wf-recorder
   slurp
   gimp
-  blender
+  pkgs-unstable.blender
+  
 
 
   # ── Moved here from home-manager (2026-07-10) ──────────────────────────────
