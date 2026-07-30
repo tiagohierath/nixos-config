@@ -36,7 +36,6 @@ with pkgs; [
   slurp
   gimp
   pkgs-unstable.blender
-  alacritty
   
 
 
