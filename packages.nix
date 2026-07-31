@@ -36,6 +36,7 @@ with pkgs; [
   slurp
   gimp
   pkgs-unstable.blender
+  fzf
   
 
 
