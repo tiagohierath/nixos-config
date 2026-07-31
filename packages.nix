@@ -34,7 +34,6 @@ with pkgs; [
   calibre
   wf-recorder
   slurp
-  gimp
   pkgs-unstable.blender
   fzf
   
