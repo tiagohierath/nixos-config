@@ -37,7 +37,6 @@ with pkgs; [
   pkgs-unstable.blender
   fzf
   ollama
-  aider-chat
   
   # ── Moved here from home-manager (2026-07-10) ──────────────────────────────
   # Wayland / Hyprland ecosystem
