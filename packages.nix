@@ -37,8 +37,8 @@ with pkgs; [
   pkgs-unstable.blender
   fzf
   llama-cpp
+  aider-chat
   
-
   # -- AI stuff, models
   python3Packages.huggingface-hub
 
