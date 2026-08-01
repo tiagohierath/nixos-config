@@ -36,6 +36,7 @@ with pkgs; [
   slurp
   pkgs-unstable.blender
   fzf
+  llama-cpp
   
 
 
