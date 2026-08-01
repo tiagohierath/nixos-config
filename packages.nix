@@ -39,6 +39,8 @@ with pkgs; [
   llama-cpp
   
 
+  # -- AI stuff, models
+  python3Packages.huggingface-hub
 
   # ── Moved here from home-manager (2026-07-10) ──────────────────────────────
   # Wayland / Hyprland ecosystem
