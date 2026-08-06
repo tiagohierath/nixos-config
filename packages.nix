@@ -39,6 +39,7 @@ with pkgs; [
   ollama
   cool-retro-term
   appimage-run
+  pkgs-unstable.codex
   
   # ── Moved here from home-manager (2026-07-10) ──────────────────────────────
   # Wayland / Hyprland ecosystem
