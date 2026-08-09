@@ -1,4 +1,4 @@
-{ pkgs, pkgs-unstable }:
+{ pkgs, pkgs-unstable, pkgs-aseprite }:
 
 with pkgs; [
   git
@@ -29,7 +29,7 @@ with pkgs; [
   zed-editor
   go
   gopls
-  pkgs-unstable.aseprite
+  pkgs-aseprite.aseprite
   vlc
   calibre
   wf-recorder
@@ -40,11 +40,14 @@ with pkgs; [
   cool-retro-term
   appimage-run
   pkgs-unstable.codex
+  easyrpg-player
   
   # ── Moved here from home-manager (2026-07-10) ──────────────────────────────
   # Wayland / Hyprland ecosystem
   swaybg
   hyprpaper
+  xwayland-satellite
+  wl-mirror
   fuzzel
   grimblast
   cliphist
@@ -63,7 +66,7 @@ with pkgs; [
   udiskie
 
   # Apps
-  firefox
+  pkgs-unstable.firefox
   obsidian
   yazi
   cmus

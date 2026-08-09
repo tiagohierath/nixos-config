@@ -1,6 +1,6 @@
 # Hardware: Intel i5-10310U, Intel UHD, Wayland/Hyprland, ext4
 # Deploy: sudo nixos-rebuild switch --flake .#tiago
-{ config, pkgs, pkgs-unstable, planit, ... }:
+{ config, pkgs, pkgs-unstable, pkgs-aseprite, planit, ... }:
 {
   imports = [ ./hardware-configuration.nix ];
 
@@ -109,6 +109,9 @@
   services.gvfs.enable = true;
 
   programs.hyprland.enable = true;
+  # Keep Hyprland available while adding Niri as an alternative scrolling
+  # session. tuigreet lets the user choose either one at login.
+  programs.niri.enable = true;
 
   # dconf backs the gsettings keys (color-scheme / gtk-theme) that the
   # theme-switch script sets, and that xdg-desktop-portal exposes to Firefox.
@@ -122,12 +125,15 @@
   # add PATH
   environment.localBinInPath = true;
 
-  # Display manager — starts Hyprland on login
+  # Display manager — F3 chooses Hyprland or Niri and remembers the choice.
   services.greetd = {
     enable = true;
     settings.default_session.command =
-      "${pkgs.tuigreet}/bin/tuigreet --time --greeting 'gm' --cmd start-hyprland";
+      "${pkgs.tuigreet}/bin/tuigreet --time --greeting 'gm' --remember --remember-user-session --sessions ${config.services.displayManager.sessionData.desktops}/share/wayland-sessions --cmd start-hyprland";
   };
+  systemd.tmpfiles.rules = [
+    "d /var/cache/tuigreet 0755 greeter greeter -"
+  ];
 
   # Drawing tablet
   hardware.opentabletdriver.enable = true;
@@ -151,7 +157,7 @@
   };
 
   environment.systemPackages =
-  import ./packages.nix { inherit pkgs pkgs-unstable; } ++ [ planit ];
+  import ./packages.nix { inherit pkgs pkgs-unstable pkgs-aseprite; } ++ [ planit ];
 
   # Auto shutdown at 9pm: one root service handles warnings, the
   # cancellation check, and the final poweroff. Touch
