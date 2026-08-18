@@ -22,11 +22,11 @@ with pkgs; [
   newsboat
   audacious
   aerc
+  libsecret # secret-tool: aerc reads its password from gnome-keyring
   khard
   openssl
   pkgs-unstable.localsend
   imagemagick
-  zed-editor
   go
   gopls
   pkgs-aseprite.aseprite
@@ -36,12 +36,12 @@ with pkgs; [
   slurp
   pkgs-unstable.blender
   fzf
-  ollama
   cool-retro-term
   appimage-run
   pkgs-unstable.codex
-  easyrpg-player
-  
+  vcv-rack
+
+
   # ── Moved here from home-manager (2026-07-10) ──────────────────────────────
   # Wayland / Hyprland ecosystem
   swaybg
