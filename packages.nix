@@ -39,7 +39,8 @@ with pkgs; [
   cool-retro-term
   appimage-run
   pkgs-unstable.codex
-  vcv-rack
+  # vcv-rack
+  # pureref
 
 
   # ── Moved here from home-manager (2026-07-10) ──────────────────────────────
