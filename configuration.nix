@@ -6,6 +6,17 @@
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
+  nix.gc = {
+    automatic = true;
+    dates = "weekly";
+    options = "--delete-older-than 14d";
+  };
+
+  nix.optimise = {
+    automatic = true;
+    dates = "weekly";
+  };
+
   # MyPaint 2.0.1 crashes on startup with pygobject >= 3.51: plain (non-GType)
   # GLib enums like GLib.UserDirectory no longer have .value_name. Only used
   # in a debug log line, so log the enum itself instead.
@@ -125,11 +136,13 @@
   # add PATH
   environment.localBinInPath = true;
 
-  # Display manager — F3 chooses Hyprland or Niri and remembers the choice.
+  # Display manager — boot into Niri by default; F3 can still select Hyprland.
+  # Keep remembering the username, but do not let the last selected compositor
+  # override Niri on the next boot.
   services.greetd = {
     enable = true;
     settings.default_session.command =
-      "${pkgs.tuigreet}/bin/tuigreet --time --greeting 'gm' --remember --remember-user-session --sessions ${config.services.displayManager.sessionData.desktops}/share/wayland-sessions --cmd start-hyprland";
+      "${pkgs.tuigreet}/bin/tuigreet --time --greeting 'gm' --remember --sessions ${config.services.displayManager.sessionData.desktops}/share/wayland-sessions --cmd niri-session";
   };
   systemd.tmpfiles.rules = [
     "d /var/cache/tuigreet 0755 greeter greeter -"

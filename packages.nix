@@ -41,6 +41,7 @@ with pkgs; [
   pkgs-unstable.codex
   # vcv-rack
   # pureref
+  pencil2d
 
 
   # ── Moved here from home-manager (2026-07-10) ──────────────────────────────
