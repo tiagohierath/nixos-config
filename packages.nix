@@ -34,7 +34,6 @@ with pkgs; [
   calibre
   wf-recorder
   slurp
-  pkgs-unstable.blender
   fzf
   cool-retro-term
   appimage-run
