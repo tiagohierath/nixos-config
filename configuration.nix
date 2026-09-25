@@ -44,6 +44,15 @@
   networking.hostName = "tiago";
   networking.networkmanager.enable = true;
 
+  # LocalSend announces itself over UDP multicast on 53317 and serves the actual
+  # transfer over TCP on the same port. The default firewall drops both, so the
+  # machine stays invisible to every other device on the LAN even though the app
+  # is running and on the right network.
+  networking.firewall = {
+    allowedTCPPorts = [ 53317 ];
+    allowedUDPPorts = [ 53317 ];
+  };
+
   # OpenSSH server: accept incoming SSH, KEY-ONLY (no password). Opens port 22
   # (openFirewall defaults to true). Authorize client keys declaratively with
   # users.users.tiago.openssh.authorizedKeys.keys = [ "ssh-ed25519 AAAA..." ];
@@ -52,6 +61,16 @@
     settings.PasswordAuthentication = false;
     settings.KbdInteractiveAuthentication = false;
   };
+
+  # This laptop self-hosts navylily.tv (auth server + cloudflared tunnel, see
+  # ~/.config/systemd/user/navylily*.service). Closing the lid must not
+  # suspend it, or the tunnel connector drops and the site goes down.
+  # lidSwitch alone only covers battery power; lidSwitchExternalPower governs
+  # lid-close while charging and defaults to "suspend" if left unset, which is
+  # what took the site down on 2026-09-16 while charging.
+  services.logind.lidSwitch = "ignore";
+  services.logind.lidSwitchExternalPower = "ignore";
+  services.logind.lidSwitchDocked = "ignore";
 
   time.timeZone = "America/Sao_Paulo";
   i18n.defaultLocale = "en_US.UTF-8";
@@ -251,7 +270,10 @@
 
   systemd.timers.nightly-shutdown = {
     description = "Trigger nightly-shutdown at 8:30pm";
-    wantedBy = [ "timers.target" ];
+    # Disabled 2026-09-12. Dropping wantedBy leaves the unit defined but never
+    # started, so re-enabling is uncommenting one line. `systemctl disable` is
+    # NOT enough here: the next nixos-rebuild recreates the symlink.
+    # wantedBy = [ "timers.target" ];
     timerConfig = {
       OnCalendar = "*-*-* 20:30:00";
       Persistent = false;
