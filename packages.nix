@@ -41,6 +41,8 @@ with pkgs; [
   # vcv-rack
   # pureref
   pencil2d
+  penpot-desktop
+  
 
 
   # ── Moved here from home-manager (2026-07-10) ──────────────────────────────
