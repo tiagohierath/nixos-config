@@ -1,0 +1,103 @@
+{ pkgs, pkgs-unstable, pkgs-aseprite }:
+
+with pkgs; [
+  git
+  vim
+  wget
+  curl
+  gh
+  ffmpeg
+  pkgs-unstable.yt-dlp
+  helix
+  (zathura.override {
+    # zathura_cb handles comic archives: .cbz/.cbr/.cb7/.cbt
+    plugins = [ zathuraPkgs.zathura_pdf_mupdf zathuraPkgs.zathura_ps zathuraPkgs.zathura_cb ];
+  })
+  baobab
+  nautilus
+  systemd
+  audacity
+  qbittorrent
+  man
+  newsboat
+  audacious
+  aerc
+  libsecret # secret-tool: aerc reads its password from gnome-keyring
+  khard
+  openssl
+  pkgs-unstable.localsend
+  imagemagick
+  go
+  gopls
+  pkgs-aseprite.aseprite
+  vlc
+  calibre
+  inotify-tools
+  wf-recorder
+  slurp
+  fzf
+  cool-retro-term
+  appimage-run
+  pkgs-unstable.codex
+  # vcv-rack
+  # pureref
+  pencil2d
+  penpot-desktop
+  
+
+
+  # ── Moved here from home-manager (2026-07-10) ──────────────────────────────
+  # Wayland / Hyprland ecosystem
+  swaybg
+  hyprpaper
+  xwayland-satellite
+  wl-mirror
+  fuzzel
+  grimblast
+  cliphist
+  wl-clipboard
+  waybar
+
+  # Audio / brightness / media control
+  pamixer
+  pavucontrol
+  brightnessctl
+  playerctl
+  upower
+  pulseaudio          # pactl CLI (used by audio-status/toggle-sink scripts)
+
+  # System tools
+  udiskie
+
+  # Apps
+  pkgs-unstable.firefox
+  obsidian
+  yazi
+  cmus
+  fastfetch
+  kitty
+  neovim
+  mpv
+  btop
+  mpd                 # user service unit lives in ~/.config/systemd/user
+
+  # Notifications
+  dunst
+  mako
+  swaynotificationcenter
+
+  # CLI tools (used by yazi keymaps)
+  ripgrep
+  fd
+  feh
+  python3
+
+  # Theming (theme-switch script + cursor)
+  glib                      # gsettings
+  libnotify                 # notify-send
+  gnome-themes-extra        # Adwaita / Adwaita-dark GTK theme
+  gsettings-desktop-schemas # org.gnome.desktop.interface schema for gsettings
+  nordzy-cursor-theme
+
+  pkgs-unstable.claude-code
+]

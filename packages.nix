@@ -32,6 +32,7 @@ with pkgs; [
   pkgs-aseprite.aseprite
   vlc
   calibre
+  inotify-tools
   wf-recorder
   slurp
   fzf
@@ -42,6 +43,10 @@ with pkgs; [
   # pureref
   pencil2d
   penpot-desktop
+  wayland
+  libxkbcommon
+  libglvnd
+  vulkan-loader
   
 
 
