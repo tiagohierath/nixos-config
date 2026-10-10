@@ -347,5 +347,19 @@
   };
 
   nixpkgs.config.allowUnfree = true;
+  programs.steam = {
+  enable = true;
+
+  # Recommended for Wayland + controllers / Steam Input
+  extest.enable = true;
+
+  # Optional but useful
+  remotePlay.openFirewall = true;
+  dedicatedServer.openFirewall = true;
+  localNetworkGameTransfers.openFirewall = true;
+
+  # Optional: Gamescope session (great for a Steam Deck-like experience)
+  # gamescopeSession.enable = true;
+};
   system.stateVersion = "24.11";
 }
