@@ -8,7 +8,7 @@ with pkgs; [
   gh
   ffmpeg
   pkgs-unstable.yt-dlp
-  helix
+  pkgs-unstable.helix
   (zathura.override {
     # zathura_cb handles comic archives: .cbz/.cbr/.cb7/.cbt
     plugins = [ zathuraPkgs.zathura_pdf_mupdf zathuraPkgs.zathura_ps zathuraPkgs.zathura_cb ];
@@ -31,7 +31,7 @@ with pkgs; [
   gopls
   pkgs-aseprite.aseprite
   vlc
-  calibre
+  pkgs-unstable.calibre
   inotify-tools
   wf-recorder
   slurp
@@ -42,12 +42,12 @@ with pkgs; [
   # vcv-rack
   # pureref
   pencil2d
-  penpot-desktop
+  pkgs-unstable.penpot-desktop
   wayland
   libxkbcommon
   libglvnd
   vulkan-loader
-  zed-editor
+  pkgs-unstable.zed-editor
   
 
 
@@ -76,7 +76,7 @@ with pkgs; [
 
   # Apps
   pkgs-unstable.firefox
-  obsidian
+  pkgs-unstable.obsidian
   yazi
   cmus
   fastfetch

@@ -347,19 +347,24 @@
   };
 
   nixpkgs.config.allowUnfree = true;
-  programs.steam = {
-  enable = true;
 
-  # Recommended for Wayland + controllers / Steam Input
-  extest.enable = true;
+  # autoUpgrade runs as root, but /etc/nixos's git repo is owned by tiago.
+  # Without this, root's --commit-lock-file hits git's "dubious ownership"
+  # guard and the lock commit fails silently. Trust the repo system-wide.
+  environment.etc.gitconfig.text = ''
+    [safe]
+      directory = /etc/nixos
+  '';
 
-  # Optional but useful
-  remotePlay.openFirewall = true;
-  dedicatedServer.openFirewall = true;
-  localNetworkGameTransfers.openFirewall = true;
+  system.autoUpgrade = {
+    enable = true;
+    flake = "/etc/nixos#tiago";
+    flags = [ "--update-input" "nixpkgs" "--update-input" "nixpkgs-unstable" "--commit-lock-file" ];
+    dates = "weekly";
+    persistent = true;
+  };
 
-  # Optional: Gamescope session (great for a Steam Deck-like experience)
-  # gamescopeSession.enable = true;
-};
   system.stateVersion = "24.11";
-}
+
+  }
+
