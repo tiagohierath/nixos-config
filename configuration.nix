@@ -72,6 +72,21 @@
   services.logind.lidSwitchExternalPower = "ignore";
   services.logind.lidSwitchDocked = "ignore";
 
+  # Lid close blanks the screen without suspending: tell niri to power the
+  # monitors off/on. Everything keeps running.
+  services.acpid = {
+    enable = true;
+    lidEventCommands = ''
+      sock=$(ls /run/user/1000/niri.*.sock | head -n1)
+      action=power-on-monitors
+      grep -q closed /proc/acpi/button/lid/*/state && action=power-off-monitors
+      ${pkgs.util-linux}/bin/runuser -u tiago -- env NIRI_SOCKET="$sock" ${pkgs.niri}/bin/niri msg action $action
+    '';
+  };
+
+  # Refresh the Orthodox calendar Waybar module (signal 11) right after waking.
+  powerManagement.resumeCommands = "${pkgs.procps}/bin/pkill -RTMIN+11 waybar || true";
+
   time.timeZone = "America/Sao_Paulo";
   i18n.defaultLocale = "en_US.UTF-8";
 
@@ -180,7 +195,18 @@
     cascadia-code
     nerd-fonts.jetbrains-mono
     nerd-fonts.caskaydia-cove
+    iosevka
+    ultimate-oldschool-pc-font-pack
+    recursive
+    noto-fonts
+    noto-fonts-color-emoji
+    nerd-fonts.symbols-only
   ];
+  fonts.fontconfig.defaultFonts = {
+    monospace = [ "Iosevka" "Symbols Nerd Font Mono" "Noto Sans Mono" "Noto Sans Symbols 2" "Noto Color Emoji" ];
+    sansSerif = [ "Iosevka" "Noto Sans" "Noto Sans Symbols 2" "Noto Color Emoji" ];
+    emoji = [ "Noto Color Emoji" ];
+  };
 
   users.users.tiago = {
     isNormalUser = true;
@@ -280,71 +306,6 @@
     };
   };
 
-  # Sunset dimming: at 7pm, switch to dark theme (waybar, wallpaper,
-  # GTK, kitty, etc. via theme-switch, same as Super+I) and drop the
-  # backlight to its lowest usable level. theme-switch needs the
-  # user's Wayland/D-Bus session env to reach hyprctl/gsettings/waybar.
-  systemd.services.sunset-dim = {
-    description = "Switch to dark theme and dim screen at sunset";
-    serviceConfig.Type = "oneshot";
-    path = [ pkgs.util-linux pkgs.procps pkgs.gnugrep pkgs.gawk ];
-    script = ''
-      hypr_pid=$(pgrep -x Hyprland | head -1)
-      if [ -n "$hypr_pid" ]; then
-        wayland_display=$(tr '\0' '\n' < /proc/$hypr_pid/environ | grep -m1 '^WAYLAND_DISPLAY=' | cut -d= -f2-)
-        hypr_sig=$(tr '\0' '\n' < /proc/$hypr_pid/environ | grep -m1 '^HYPRLAND_INSTANCE_SIGNATURE=' | cut -d= -f2-)
-        runuser -u tiago -- \
-          env XDG_RUNTIME_DIR=/run/user/1000 \
-              WAYLAND_DISPLAY="$wayland_display" \
-              HYPRLAND_INSTANCE_SIGNATURE="$hypr_sig" \
-              DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1000/bus \
-              /home/tiago/.local/bin/theme-switch dark || true
-      fi
-      ${pkgs.brightnessctl}/bin/brightnessctl set 1%
-    '';
-  };
-
-  systemd.timers.sunset-dim = {
-    description = "Trigger sunset-dim at 7pm";
-    wantedBy = [ "timers.target" ];
-    timerConfig = {
-      OnCalendar = "*-*-* 19:00:00";
-      Persistent = false;
-    };
-  };
-
-  # Morning reset: undo sunset-dim so the screen isn't stuck dark,
-  # whether the laptop stayed on overnight or was rebooted (NixOS's
-  # systemd-backlight service would otherwise restore the dimmed
-  # level on every boot).
-  systemd.services.sunrise-brighten = {
-    description = "Switch to light theme and restore full brightness in the morning";
-    serviceConfig.Type = "oneshot";
-    path = [ pkgs.util-linux pkgs.procps pkgs.gnugrep pkgs.gawk ];
-    script = ''
-      ${pkgs.brightnessctl}/bin/brightnessctl set 100%
-      hypr_pid=$(pgrep -x Hyprland | head -1)
-      if [ -n "$hypr_pid" ]; then
-        wayland_display=$(tr '\0' '\n' < /proc/$hypr_pid/environ | grep -m1 '^WAYLAND_DISPLAY=' | cut -d= -f2-)
-        hypr_sig=$(tr '\0' '\n' < /proc/$hypr_pid/environ | grep -m1 '^HYPRLAND_INSTANCE_SIGNATURE=' | cut -d= -f2-)
-        runuser -u tiago -- \
-          env XDG_RUNTIME_DIR=/run/user/1000 \
-              WAYLAND_DISPLAY="$wayland_display" \
-              HYPRLAND_INSTANCE_SIGNATURE="$hypr_sig" \
-              DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1000/bus \
-              /home/tiago/.local/bin/theme-switch light || true
-      fi
-    '';
-  };
-
-  systemd.timers.sunrise-brighten = {
-    description = "Trigger sunrise-brighten at 7am";
-    wantedBy = [ "timers.target" ];
-    timerConfig = {
-      OnCalendar = "*-*-* 07:00:00";
-      Persistent = true;
-    };
-  };
 
   nixpkgs.config.allowUnfree = true;
 

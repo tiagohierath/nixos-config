@@ -2,6 +2,7 @@
 
 with pkgs; [
   git
+  pkgs-unstable.jujutsu   # jj: Git-compatible VCS, colocated on top of existing repos
   vim
   wget
   curl
@@ -41,13 +42,11 @@ with pkgs; [
   pkgs-unstable.codex
   # vcv-rack
   # pureref
-  pencil2d
   pkgs-unstable.penpot-desktop
   wayland
   libxkbcommon
   libglvnd
   vulkan-loader
-  pkgs-unstable.zed-editor
   
 
 
@@ -61,6 +60,8 @@ with pkgs; [
   grimblast
   cliphist
   wl-clipboard
+  bemoji
+  wtype
   waybar
 
   # Audio / brightness / media control
