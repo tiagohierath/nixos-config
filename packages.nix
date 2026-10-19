@@ -47,6 +47,7 @@ with pkgs; [
   libxkbcommon
   libglvnd
   vulkan-loader
+  openutau
   
 
 
