@@ -204,7 +204,7 @@
   ];
   fonts.fontconfig.defaultFonts = {
     monospace = [ "Iosevka" "Symbols Nerd Font Mono" "Noto Sans Mono" "Noto Sans Symbols 2" "Noto Color Emoji" ];
-    sansSerif = [ "Iosevka" "Noto Sans" "Noto Sans Symbols 2" "Noto Color Emoji" ];
+    sansSerif = [ "Noto Sans" "Noto Sans Symbols 2" "Noto Color Emoji" ];
     emoji = [ "Noto Color Emoji" ];
   };
 
