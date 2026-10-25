@@ -48,6 +48,7 @@ with pkgs; [
   libglvnd
   vulkan-loader
   blender
+  alsa-lib
   
 
 
