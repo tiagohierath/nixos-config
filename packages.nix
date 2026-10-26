@@ -30,7 +30,6 @@ with pkgs; [
   imagemagick
   go
   gopls
-  pkgs-aseprite.aseprite
   vlc
   pkgs-unstable.calibre
   inotify-tools
