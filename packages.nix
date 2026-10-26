@@ -47,7 +47,7 @@ with pkgs; [
   libxkbcommon
   libglvnd
   vulkan-loader
-  blender
+  pkgs-unstable.blender
   alsa-lib
   
 

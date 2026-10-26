@@ -6,7 +6,12 @@
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
-  programs.nix-ld.enable = true;
+  programs.nix-ld = {
+    enable = true;
+    libraries = with pkgs; [
+      alsa-lib
+  ];
+};
 
   nix.gc = {
     automatic = true;
