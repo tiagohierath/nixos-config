@@ -48,7 +48,7 @@ with pkgs; [
   vulkan-loader
   pkgs-unstable.blender
   alsa-lib
-  unzip
+  p7zip
   
 
 
