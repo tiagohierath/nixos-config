@@ -1,4 +1,4 @@
-{ pkgs, pkgs-unstable, pkgs-aseprite }:
+{ pkgs, pkgs-unstable }:
 
 with pkgs; [
   git
@@ -48,6 +48,7 @@ with pkgs; [
   vulkan-loader
   pkgs-unstable.blender
   alsa-lib
+  unzip
   
 
 

@@ -1,6 +1,6 @@
 # Hardware: Intel i5-10310U, Intel UHD, Wayland/Hyprland, ext4
 # Deploy: sudo nixos-rebuild switch --flake .#tiago
-{ config, pkgs, pkgs-unstable, pkgs-aseprite, planit, ... }:
+{ config, pkgs, pkgs-unstable, planit, ... }:
 {
   imports = [ ./hardware-configuration.nix ];
 
@@ -222,7 +222,7 @@
   };
 
   environment.systemPackages =
-  import ./packages.nix { inherit pkgs pkgs-unstable pkgs-aseprite; } ++ [ planit ];
+  import ./packages.nix { inherit pkgs pkgs-unstable; } ++ [ planit ];
 
   # Auto shutdown at 9pm: one root service handles warnings, the
   # cancellation check, and the final poweroff. Touch
