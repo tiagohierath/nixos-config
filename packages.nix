@@ -49,7 +49,7 @@ with pkgs; [
   pkgs-unstable.blender
   alsa-lib
   p7zip
-  
+  darktable
 
 
   # ── Moved here from home-manager (2026-07-10) ──────────────────────────────
@@ -78,7 +78,7 @@ with pkgs; [
   udiskie
 
   # Apps
-  pkgs-unstable.firefox
+  firefox
   pkgs-unstable.obsidian
   yazi
   cmus
