@@ -46,10 +46,9 @@ with pkgs; [
   libxkbcommon
   libglvnd
   vulkan-loader
-  pkgs-unstable.blender
+##   pkgs-unstable.blender
   alsa-lib
   p7zip
-  darktable
 
 
   # ── Moved here from home-manager (2026-07-10) ──────────────────────────────
